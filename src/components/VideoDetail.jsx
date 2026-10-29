@@ -7,15 +7,21 @@ import { Context } from "./ContextProvider";
 const VideoDetail = ()=>{
     const { selectedVideo } = useContext(Context);
 
-    const videoSrc = `https://www.youtube.com/embed/${selectedVideo.id.videoId}`
+    const videoSrc = `https://www.youtube-nocookie.com/embed/${selectedVideo.id}?rel=0`
     return(
         <Container>
             <VideoContainer>
-                <Iframe  title='video player' src={videoSrc} allowFullScreen frameBorder="0"/>
+                <Iframe
+                    title={selectedVideo.title}
+                    src={videoSrc}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    frameBorder="0"
+                />
             </VideoContainer>
             <ContentTitle>
-                <h4>{selectedVideo.snippet.title} - {selectedVideo.snippet.channelTitle }</h4>
-                <h5>{selectedVideo.snippet.description }</h5>
+                <h4>{selectedVideo.title} - {selectedVideo.channel}</h4>
+                <h5>{selectedVideo.description}</h5>
             </ContentTitle>
         </Container>
     )
@@ -26,35 +32,28 @@ const Container = styled.div`
     display:grid;
     width:100%;
     background-color:#a7cdf585;
-    grid-template-rows: 3fr 1fr; 
+    grid-template-rows: auto auto;
+    align-content: start;
 `
 const Iframe = styled.iframe`
-    height:100%;
+    display: block;
     width:100%;
-    // @media (min-width: 1072px) {
-    //     height:575px;
-    // } 
-    // @media (min-width: 1875px) {
-    //     height:850px;
-    // } 
+    aspect-ratio: 16 / 9;
 `
 const VideoContainer = styled.div`
-    display:grid;
-    height: 100%;
     width: 100%;
     padding:2%;
 `
 const ContentTitle = styled.div`
-    justify-items: center;
-    -webkit-align-self: center;
-    -ms-flex-item-align: center;
-    align-self: center;
-    padding-left: 3%;
-    padding-right: 2%;
+    padding: 0 3% 3%;
     line-height: 1.5;
     font-family: cursive;
-    font-size: 1.2rem;
+    font-size: 1.6rem;
+    h4 {
+        font-weight: bold;
+        margin-bottom: 0.8rem;
+    }
     @media (min-width: 1072px) {
-        font-size: 2.4rem;
+        font-size: 2rem;
     }
 `

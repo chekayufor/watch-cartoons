@@ -1,22 +1,20 @@
 import React from 'react';
 import styled from "styled-components";
 
-const VideoItem = ({video, onSelectVideo}) => {
+const VideoItem = ({video, onSelectVideo, isSelected}) => {
     return(
         <List>
-            <Item onClick={()=> onSelectVideo(video)}>
-                <Img alt='thumbnail' src={video.snippet.thumbnails.medium.url}/>
-                <ItemTitle>{video.snippet.title}</ItemTitle>
+            <Item type='button' onClick={()=> onSelectVideo(video)} $isSelected={isSelected}>
+                <Img alt='' loading='lazy' src={video.thumbnail}/>
+                <ItemTitle>{video.title}</ItemTitle>
             </Item>
         </List>
     )
 }
 export default VideoItem;
 
-const List = styled.div`
+const List = styled.li`
     display: grid;
-    grid-gap: 1%;
-    font-size: 1.8rem;
     width:100%;
 `
 const Img = styled.img`
@@ -27,17 +25,19 @@ const Img = styled.img`
         width:100%;
     }
 `
-const Item = styled.div`
+const Item = styled.button`
     display: grid;
     grid-template-columns: 1fr 1fr;
     cursor: pointer;
     align-items: center;
     border: coral 1px dashed;
     justify-items: start;
-    background-color: #a7cdf585;
+    background-color: ${({ $isSelected }) => $isSelected ? '#ffd8a8' : '#a7cdf585'};
     padding: 2%;
+    width: 100%;
+    font: inherit;
+    text-align: left;
     @media (min-width: 1072px) {
-        grid-template-rows: 3fr 1fr;
         grid-template-columns: 100%;
         justify-items: center;
     }
@@ -45,8 +45,9 @@ const Item = styled.div`
 `
 const ItemTitle = styled.div`
     text-align:center;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
+    padding: 0.6rem;
     @media (min-width: 1072px) {
-        font-size: 2rem;
+        font-size: 1.6rem;
     }
 `

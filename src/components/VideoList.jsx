@@ -1,79 +1,31 @@
-import React, {useState, useEffect, useRef, useContext} from 'react';
+import React, {useContext} from 'react';
 import VideoItem from './VideoItem';
 import styled from "styled-components";
-import youtube from '../api/youtube';
 import { Context } from "./ContextProvider";
-import {Key} from '../api/Key';
-
-
-
-
 
 const VideoList = ()=>{
-    const [isFetching, setIsFetching] = useState(false);
-    const { videos,onVideoSelect, setVideos,searchTerm } = useContext(Context);
+    const { videos, selectedVideo, onVideoSelect, fetchMore, hasMore, isLoading } = useContext(Context);
 
-    console.log("list", videos);
-    const boxRef = useRef(null);
-    const ulRef = useRef(null);
-
-    useEffect(() => {
-        boxRef.current.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
-
-    useEffect(() => {
-        if (!isFetching) return;
-        fetchMoreListItems(searchTerm);
-    }, [isFetching]);
-
-    const fetchMoreListItems = async (searchTerm) => {
-        const response = await youtube.get('search', {  
-           params: {
-                part: 'snippet',
-                maxResults: 50,
-                key: Key,
-                q:searchTerm,
-                order:'viewCount',
-                pageToken:'CAoQAA',
-                pageInfo: {
-                    totalResults: 100,
-                    resultsPerPage: 15
-                  },
-                type:'video',
-            }
-        }); 
-        console.log(response.data.items);
-        setVideos(prevState => [
-            ...prevState,
-            ...Array.from(response.data.items)
-            ]);
-            setIsFetching(false);
+    const handleScroll = (e) => {
+        const box = e.currentTarget;
+        const bottom = box.scrollHeight - box.clientHeight - box.scrollTop;
+        if (bottom < 50 && hasMore && !isLoading) fetchMore();
     }
 
-    function handleScroll() {
-        const boxHeight = boxRef.current.getBoundingClientRect().height;
-        const ulHeight = ulRef.current.getBoundingClientRect().height;
-        const boxScroll = boxRef.current.scrollTop;
-        const bottom = ulHeight - boxHeight - boxScroll;
-        // console.log("bottom: ", bottom);
-
-        if (bottom > 5 || isFetching) return;
-
-        console.log("Fetch more list items!");
-
-        setIsFetching(true);
-    }
-
-
-
-    const listOfVideos = videos.map((video, id) => <VideoItem  onSelectVideo={onVideoSelect} key={id}  video ={video}/>)
+    const listOfVideos = videos.map(video => (
+        <VideoItem
+            key={video.id}
+            video={video}
+            onSelectVideo={onVideoSelect}
+            isSelected={selectedVideo && selectedVideo.id === video.id}
+        />
+    ))
     return (
-        
-        <List  ref = {boxRef} container spacing={10}>
-            <ul ref = {ulRef}>
+        <List onScroll={handleScroll}>
+            <ul>
                 {listOfVideos}
             </ul>
+            {isLoading && hasMore && <Note>Loading more...</Note>}
         </List>
     );
 }
@@ -85,7 +37,11 @@ const List = styled.div`
     height: 100%;
     width: 100%;
     border-radius: 0.4rem;
-    overflow-y: scroll;
+    overflow-y: auto;
     box-shadow: 0 0.2rem 0.8rem dimgrey;
     min-height: 320px;
+`
+const Note = styled.p`
+    text-align: center;
+    padding: 1rem;
 `
